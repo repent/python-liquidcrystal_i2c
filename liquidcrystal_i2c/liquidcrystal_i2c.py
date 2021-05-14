@@ -242,24 +242,29 @@ class LiquidCrystal_I2C:
                 content = content.ljust(self._numcols)
             self.printline(line_no, content)
 
-    def printscrolling(self, text, scrollspeed=5, initialpause=1):
+    def printscrolling(self, text, scrollspeed=5, initialpause=1, \
+        repeat=1):
         """Scroll through an unlimited tract of text"""
         # initialpause adds an initial delay when the text first appears,
-        # befor scrolling starts
+        # befor scrolling starts (and between iterations)
         # scrollspeeds between 1 and 10 are sane(ish)
         delay = 5 / scrollspeed
         wrapped_text = wrap(text, self._numcols)
-        for i in range(len(wrapped_text) - self._numlines + 1):
-            self.printscreen(wrapped_text[i:(i+self._numlines)], \
-                truncate=False, pad=True)
+        for n in range(repeat):
+            pause = initialpause
+            for i in range(len(wrapped_text) - self._numlines + 1):
+                self.printscreen(wrapped_text[i:(i+self._numlines)], \
+                    truncate=False, pad=True)
+                time.sleep(delay + pause)
+                pause = 0
             time.sleep(delay + initialpause)
-            initialpause = 0
+
+    #def scrollonce(self, wrapped_text, scrollspeed=5, initialpause=1):
 
     ### mid level commands, for sending data/cmds ###
 
     def _command(self, value):
         self._send(value, 0);
-
 
     ### low level data pushing commands ###
 
