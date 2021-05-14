@@ -5,6 +5,7 @@
 
 import smbus
 import time
+from textwrap import wrap
 
 class LiquidCrystal_I2C:
     # commands
@@ -119,6 +120,7 @@ class LiquidCrystal_I2C:
     def setCursor(self, col, row):
         """Set cursor to col, row"""
         row_offsets = [ 0x00, 0x40, 0x14, 0x54 ]
+        #row_offsets = [ 0x00, 0x14, 0x40, 0x54 ]
         if row < 0 or row >= self._numlines:
             raise IndexError('Argument row out of range') # we count rows starting w/0
         self._command(LiquidCrystal_I2C._LCD_SETDDRAMADDR | \
@@ -222,15 +224,36 @@ class LiquidCrystal_I2C:
         self.setCursor(0, linenr)
         self.printstr(value)
 
-    def printscreen(self, arr_value, truncate=True):
+    def printpara(self, text):
+        """Print wrapped text sanely"""
+        wrapped_text = wrap(text, self._numcols)
+        self.printscreen(wrapped_text[0:self._numlines])
+
+    def printscreen(self, arr_value, truncate=True, pad=True):
         """Print an array of lines to the whole screen"""
         if len(arr_value) > self._numlines:
-            raise IndexError('Argument row out of range')
+            error = "Argument row out of range (got " + str(len(arr_value)) + \
+            " lines but only have space for " + str(self._numlines) + ")"
+            raise IndexError(error)
         for line_no, content in enumerate(arr_value, start=0):
             if truncate:
-                self.printline(line_no, content[:self._numcols])
-            else:
-                self.printline(line_no, content)
+                content = content[:self._numcols]
+            if pad:
+                content = content.ljust(self._numcols)
+            self.printline(line_no, content)
+
+    def printscrolling(self, text, scrollspeed=5, initialpause=1):
+        """Scroll through an unlimited tract of text"""
+        # initialpause adds an initial delay when the text first appears,
+        # befor scrolling starts
+        # scrollspeeds between 1 and 10 are sane(ish)
+        delay = 5 / scrollspeed
+        wrapped_text = wrap(text, self._numcols)
+        for i in range(len(wrapped_text) - self._numlines + 1):
+            self.printscreen(wrapped_text[i:(i+self._numlines)], \
+                truncate=False, pad=True)
+            time.sleep(delay + initialpause)
+            initialpause = 0
 
     ### mid level commands, for sending data/cmds ###
 
