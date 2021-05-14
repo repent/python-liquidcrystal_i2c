@@ -54,12 +54,13 @@ class LiquidCrystal_I2C:
     _Rs = 0x01  # Register select bit
 
 
-    def __init__(self, addr, port, numlines=2, clear=True):
+    def __init__(self, addr, port, numlines=2, numcolumns=20, clear=True):
         self._addr = addr
         self._smbus = smbus.SMBus(port)
         self._backlightval = 0x08 # always on
 
         self._numlines = numlines
+        self._numcols = numcolumns
 
         # SEE PAGE 45/46 FOR INITIALIZATION SPECIFICATION!
         # according to datasheet, we need at least 40ms after power rises above 2.7V
@@ -217,8 +218,19 @@ class LiquidCrystal_I2C:
 
     # print line starting at linenr #0
     def printline(self, linenr, value):
+        """Print text on the specified line"""
         self.setCursor(0, linenr)
         self.printstr(value)
+
+    def printscreen(self, arr_value, truncate=True):
+        """Print an array of lines to the whole screen"""
+        if len(arr_value) > self._numlines:
+            raise IndexError('Argument row out of range')
+        for line_no, content in enumerate(arr_value, start=0):
+            if truncate:
+                self.printline(line_no, content[:self._numcols])
+            else:
+                self.printline(line_no, content)
 
     ### mid level commands, for sending data/cmds ###
 
