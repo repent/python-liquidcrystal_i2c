@@ -93,3 +93,6 @@ ENV/
 
 # Backup file
 *~
+
+# Documents
+*.ods

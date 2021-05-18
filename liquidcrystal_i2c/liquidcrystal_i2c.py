@@ -218,6 +218,9 @@ class LiquidCrystal_I2C:
         for c in value:
             self._send(ord(c), 0x01)
 
+    def printval(self, value):
+        self._send(value, 0x01)
+
     # print line starting at linenr #0
     def printline(self, linenr, value):
         """Print text on the specified line"""
