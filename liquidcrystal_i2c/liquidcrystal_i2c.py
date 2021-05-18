@@ -262,6 +262,32 @@ class LiquidCrystal_I2C:
                 pause = 0
             time.sleep(delay + initialpause)
 
+    # def printscollongscreen(self, arr_value, pad=True, initialpause=1, \
+    #     repeat=1):
+    #     """Print an array of lines to the whole screen, which individually
+    #     scroll if they or overlength"""
+    #     delay = 5 / scrollspeed
+    #     if len(arr_value) > self._numlines:
+    #         error = "Argument row out of range (got " + str(len(arr_value)) + \
+    #         " lines but only have space for " + str(self._numlines) + ")"
+    #         raise IndexError(error)
+    #     for n in range(repeat):
+    #         pause = initialpause
+
+    def console(self):
+        buffer = []
+        print("Enter text to be copied to the LCD (ctrl-d to quit):")
+        while True:
+            try:
+                line = input()
+            except EOFError:
+                print("Goodbye!")
+                break
+            if len(buffer) == self._numlines:
+                buffer.pop(0)
+            buffer.append(line)
+            self.printscreen(buffer)
+
     #def scrollonce(self, wrapped_text, scrollspeed=5, initialpause=1):
 
     ### mid level commands, for sending data/cmds ###
