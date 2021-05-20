@@ -6,6 +6,10 @@
 import smbus
 import time
 from textwrap import wrap
+try:
+    import ipdb
+except ImportError:
+    pass
 
 class LiquidCrystal_I2C:
     # commands
@@ -54,6 +58,15 @@ class LiquidCrystal_I2C:
     _Rw = 0x02  # Read/Write bit
     _Rs = 0x01  # Register select bit
 
+    _UNICODE_MAP = {
+        '→': 127, # ~
+        '←': 128,
+        '°': 223, # ß
+        'α': 224,
+        'β': 226,
+        'Ω': 244,
+        'π': 247,
+    }
 
     def __init__(self, addr, port, numlines=2, numcolumns=20, clear=True):
         self._addr = addr
@@ -213,10 +226,15 @@ class LiquidCrystal_I2C:
         self._backlightval = LiquidCrystal_I2C._LCD_BACKLIGHT
         self._expanderWrite(0);
 
-    def printstr(self, value):
+    def printstr(self, value, map_symbols=True):
         """Print string at cursor"""
         for c in value:
-            self._send(ord(c), 0x01)
+            #ipdb.set_trace()
+            if map_symbols and c in self._UNICODE_MAP:
+                #print("Intercepting symbol", c, "!")
+                self._send(self._UNICODE_MAP[c], 0x01)
+            else:
+                self._send(ord(c), 0x01)
 
     def printval(self, value):
         self._send(value, 0x01)
