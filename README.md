@@ -28,14 +28,24 @@ git clone --depth=1 https://github.com/repent/python-liquidcrystal_i2c.git
 (cd python-liquidcrystal_i2c/ && python setup.py install)
 ```
 
+This also seems to work:
+
+```
+pip install https://github.com/repent/python-liquidcrystal_i2c/archive/master.zip
+```
+
 ### Dependencies
 
 python-liquidcrystal_i2c depends on a ```smbus```-distribution.
 
+```
+pip install smbus2
+```
+
 ### Access rights
 
 python-liquidcrystal_i2c needs read/write access to the i2c-bus.
-Either add your user to the i2c group (`adduser <user> i2c` -- you may have to reboot) or grant rights to anyone (`chmod 666 /dev/i2c-*`).
+Either add your user to the i2c group (`adduser <user> i2c` -- you may have to reboot) or grant rights to everyone (`chmod 666 /dev/i2c-*`).
 
 ## Examples
 
